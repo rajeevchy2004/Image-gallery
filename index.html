@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Gallery</title>
+    <style>
+        /* 3D Animation Background */
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: black;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .wrap {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .c {
+            position: relative;
+            height: 400px;
+            width: 0.69444%;
+            margin-top: -400px;
+            animation: drop 4s infinite ease-in;
+        }
+
+        .c:after {
+            content: "";
+            position: absolute;
+            width: 0.9vw;
+            height: 0.9vw;
+            border-radius: 50%;
+            left: 50%;
+            bottom: -0.45vw;
+            margin-left: -0.45vw;
+        }
+
+        @keyframes drop {
+            80% {
+                opacity: 1;
+            }
+            100% {
+                transform: translate3d(0, 150vh, 0);
+                opacity: 0;
+            }
+        }
+
+        /* Image Gallery Styles */
+        h1 {
+            text-align: center;
+            color: white;
+            padding: 20px;
+            margin-top: 50px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .gallery {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            padding: 20px;
+        }
+
+        .category {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .category h2 {
+            margin-left: 20px;
+            font-size: 2rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .image-row {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding: 15px;
+            white-space: nowrap;
+            position: relative;
+            scroll-behavior: smooth;
+        }
+
+        .image-row a {
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .image-row a:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+        }
+
+        .image-row img {
+            height: 180px;
+            width: auto;
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        /* Scroll buttons */
+        .scroll-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            padding: 15px;
+            cursor: pointer;
+            z-index: 10;
+            border-radius: 50%;
+            font-size: 24px;
+            transition: background-color 0.3s ease;
+        }
+
+        .scroll-btn:hover {
+            background-color: rgba(240, 9, 128, 0.9);
+        }
+
+        .scroll-btn.left {
+            left: 10px;
+        }
+
+        .scroll-btn.right {
+            right: 10px;
+        }
+
+        /* Lightbox Styles */
+        .lightbox {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            padding-top: 60px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            text-align: center;
+        }
+
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 80%;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+        }
+
+        .close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: white;
+            font-size: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color:rgb(225, 9, 9);
+        }
+
+        .download-btn {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color:rgb(6, 169, 215);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+        }
+
+        .download-btn:hover {
+            background-color:rgb(22, 10, 192);
+        }
+
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(69, 212, 3, 0.7);
+            color: white;
+            border: none;
+            padding: 15px;
+            cursor: pointer;
+            z-index: 10;
+            border-radius: 50%;
+            font-size: 24px;
+            transition: background-color 0.3s ease;
+        }
+
+        .lightbox-nav:hover {
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .lightbox-nav.left {
+            left: 20px;
+        }
+
+        .lightbox-nav.right {
+            right: 20px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .category h2 {
+                font-size: 1.5rem;
+            }
+
+            .image-row img {
+                height: 120px;
+            }
+
+            .scroll-btn, .lightbox-nav {
+                padding: 10px;
+                font-size: 20px;
+            }
+
+            .download-btn {
+                padding: 10px 20px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 3D Animation Background -->
+    <div class="wrap">
+        <script>
+            for (let i = 0; i < 144; i++) {
+                const hue = (300 / 144) * i;
+                document.querySelector('.wrap').innerHTML += `
+                    <div class="c" style="
+                        left: ${(i - 1) * 0.69444}%;
+                        background-image: linear-gradient(to bottom, black, hsla(${hue}, 100%, 50%, 0.8));
+                        animation-delay: ${Math.random() * -4}s;
+                    ">
+                        <div style="
+                            background: hsla(${hue}, 100%, 50%, 1);
+                            width: 0.9vw;
+                            height: 0.9vw;
+                            border-radius: 50%;
+                            position: absolute;
+                            left: 50%;
+                            bottom: -0.45vw;
+                            margin-left: -0.45vw;
+                        "></div>
+                    </div>`;
+            }
+        </script>
+    </div>
+
+    <h1>Image Gallery</h1>
+    <div class="gallery">
+        <!-- Humans Category -->
+        <div class="category">
+            <h2>Humans</h2>
+            <div class="image-row">
+                <button class="scroll-btn left" onclick="scrollLeft(this)">&#10094;</button>
+                <a href="h1.jpg"><img src="h1.jpg" alt="Human 1"></a>
+                <a href="h2.jpeg"><img src="h2.jpeg" alt="Human 2"></a>
+                <a href="h3.jpeg"><img src="h3.jpeg" alt="Human 3"></a>
+                <a href="h4.jpeg"><img src="h4.jpeg" alt="Human 4"></a>
+                <a href="h5.jpg"><img src="h5.jpg" alt="Human 5"></a>
+                <button class="scroll-btn right" onclick="scrollRight(this)">&#10095;</button>
+            </div>
+        </div>
+
+        <!-- Animals Category -->
+        <div class="category">
+            <h2>Animals</h2>
+            <div class="image-row">
+                <button class="scroll-btn left" onclick="scrollLeft(this)">&#10094;</button>
+                <a href="a1.jpg"><img src="a1.jpg" alt="Animal 1"></a>
+                <a href="a2.jpg"><img src="a2.jpg" alt="Animal 2"></a>
+                <a href="a3.jpeg"><img src="a3.jpeg" alt="Animal 3"></a>
+                <a href="a4.jpeg"><img src="a4.jpeg" alt="Animal 4"></a>
+                <a href="a5.jpg"><img src="a5.jpg" alt="Animal 5"></a>
+                <button class="scroll-btn right" onclick="scrollRight(this)">&#10095;</button>
+            </div>
+        </div>
+
+        <!-- Nature Category -->
+        <div class="category">
+            <h2>Nature</h2>
+            <div class="image-row">
+                <button class="scroll-btn left" onclick="scrollLeft(this)">&#10094;</button>
+                <a href="n1.jpg"><img src="n1.jpg" alt="Nature 1"></a>
+                <a href="n2.jpg"><img src="n2.jpg" alt="Nature 2"></a>
+                <a href="n3.jpg"><img src="n3.jpg" alt="Nature 3"></a>
+                <a href="n4.jpg"><img src="n4.jpg" alt="Nature 4"></a>
+                <a href="n5.jpg"><img src="n5.jpg" alt="Nature 5"></a>
+                <button class="scroll-btn right" onclick="scrollRight(this)">&#10095;</button>
+            </div>
+        </div>
+
+        <!-- Rivers Category -->
+        <div class="category">
+            <h2>Rivers</h2>
+            <div class="image-row">
+                <button class="scroll-btn left" onclick="scrollLeft(this)">&#10094;</button>
+                <a href="r1.jpg"><img src="r1.jpg" alt="River 1"></a>
+                <a href="r2.jpg"><img src="r2.jpg" alt="River 2"></a>
+                <a href="r3.jpeg"><img src="r3.jpeg" alt="River 3"></a>
+                <a href="r4.jpeg"><img src="r4.jpeg" alt="River 4"></a>
+                <a href="r5.jpeg"><img src="r5.jpeg" alt="River 5"></a>
+                <button class="scroll-btn right" onclick="scrollRight(this)">&#10095;</button>
+            </div>
+        </div>
+
+        <!-- Trees Category -->
+        <div class="category">
+            <h2>Trees</h2>
+            <div class="image-row">
+                <button class="scroll-btn left" onclick="scrollLeft(this)">&#10094;</button>
+                <a href="t1.jpeg"><img src="t1.jpeg" alt="Tree 1"></a>
+                <a href="t2.jpeg"><img src="t2.jpeg" alt="Tree 2"></a>
+                <a href="t3.jpeg"><img src="t3.jpeg" alt="Tree 3"></a>
+                <a href="t4.jpeg"><img src="t4.jpeg" alt="Tree 4"></a>
+                <a href="t5.jpg"><img src="t5.jpg" alt="Tree 5"></a>
+                <button class="scroll-btn right" onclick="scrollRight(this)">&#10095;</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox">
+        <span class="close">&times;</span>
+        <button class="lightbox-nav left" onclick="prevImage()">&#10094;</button>
+        <img class="lightbox-content" id="lightbox-img">
+        <button class="lightbox-nav right" onclick="nextImage()">&#10095;</button>
+        <button class="download-btn" id="download-btn">Download</button>
+    </div>
+
+    <script>
+        // Lightbox functionality
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const closeBtn = document.querySelector('.close');
+        const downloadBtn = document.getElementById('download-btn');
+        const images = document.querySelectorAll('.image-row img');
+
+        let currentImageIndex = 0;
+        let currentImageSrc = '';
+        let imageSources = [];
+
+        images.forEach((img, index) => {
+            img.addEventListener('click', (event) => {
+                event.preventDefault();
+                currentImageIndex = index;
+                currentImageSrc = img.src;
+                imageSources = Array.from(images).map(img => img.src);
+                lightbox.style.display = 'block';
+                lightboxImg.src = currentImageSrc;
+            });
+        });
+
+        // Close lightbox
+        closeBtn.addEventListener('click', () => {
+            lightbox.style.display = 'none';
+        });
+
+        // Close lightbox when clicking outside the image
+        lightbox.addEventListener('click', (e) => {
+            if (e.target !== lightboxImg && e.target !== downloadBtn && !e.target.classList.contains('lightbox-nav')) {
+                lightbox.style.display = 'none';
+            }
+        });
+
+        // Download button functionality
+        downloadBtn.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.href = currentImageSrc;
+            link.download = 'image.jpg';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        // Scroll buttons functionality
+        function scrollLeft(button) {
+            const imageRow = button.parentElement;
+            imageRow.scrollBy({ left: -200, behavior: 'smooth' });
+        }
+
+        function scrollRight(button) {
+            const imageRow = button.parentElement;
+            imageRow.scrollBy({ left: 200, behavior: 'smooth' });
+        }
+
+        // Lightbox navigation
+        function prevImage() {
+            currentImageIndex = (currentImageIndex - 1 + imageSources.length) % imageSources.length;
+            lightboxImg.src = imageSources[currentImageIndex];
+            currentImageSrc = imageSources[currentImageIndex];
+        }
+
+        function nextImage() {
+            currentImageIndex = (currentImageIndex + 1) % imageSources.length;
+            lightboxImg.src = imageSources[currentImageIndex];
+            currentImageSrc = imageSources[currentImageIndex];
+        }
+    </script>
+</body>
+</html>  
